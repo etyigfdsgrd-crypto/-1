@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="uk" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Розклад МППК | Cyberpunk Neon Edition</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            bg: '#08090f',
+                            card: '#101423',
+                            panel: '#161b30',
+                            border: '#212946',
+                            cyan: '#00f0ff',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #08090f;
+            /* Шлях відносний (./) гарантує зчитування файлу в цій же папці */
+            background-image: 
+                linear-gradient(rgba(8, 9, 15, 0.85), rgba(8, 9, 15, 0.85)),
+                url('./image_ed85be.jpg');
+            background-size: cover;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            min-height: 100vh;
+            font-family: 'Rajdhani', sans-serif;
+            color: #e2e8f0;
+        }
+
+        .neon-border-cyan {
+            box-shadow: 0 0 10px rgba(0, 240, 255, 0.3), inset 0 0 10px rgba(0, 240, 255, 0.1);
+            border: 1px solid rgba(0, 240, 255, 0.5);
+        }
+
+        .neon-border-pink {
+            box-shadow: 0 0 10px rgba(255, 0, 127, 0.3), inset 0 0 10px rgba(255, 0, 127, 0.1);
+            border: 1px solid rgba(255, 0, 127, 0.5);
+        }
+
+        .neon-text-cyan {
+            text-shadow: 0 0 8px rgba(0, 240, 255, 0.7), 0 0 20px rgba(0, 240, 255, 0.4);
+        }
+
+        .neon-text-pink {
+            text-shadow: 0 0 8px rgba(255, 0, 127, 0.7), 0 0 20px rgba(255, 0, 127, 0.4);
+        }
+
+        .neon-text-purple {
+            text-shadow: 0 0 8px rgba(157, 0, 255, 0.7), 0 0 20px rgba(157, 0, 255, 0.4);
+        }
+
+        .glass-panel {
+            background: rgba(16, 20, 35, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-card {
+            background: rgba(22, 27, 48, 0.7);
+            backdrop-filter: blur(8px);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            transform: translateY(-2px);
+            border-color: rgba(0, 240, 255, 0.6);
+            box-shadow: 0 8px 25px -5px rgba(0, 240, 255, 0.25);
+        }
+
+        /* Cyberpunk scanlines effect overlay */
+        .scanline-overlay {
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%, 
+                rgba(0, 0, 0, 0.25) 50%
+            );
+            background-size: 100% 4px;
+            pointer-events: none;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #08090f;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #212946;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+            box-shadow: 0 0 10px #00f0ff;
+        }
+
+        .active-day-tab {
+            background: linear-gradient(135deg, rgba(0, 240, 255, 0.2), rgba(157, 0, 255, 0.2));
+            border-bottom: 2px solid #00f0ff;
+            color: #ffffff;
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.4);
+        }
+
+        .practice-glow {
+            border: 1px solid #ffcc00 !important;
+            box-shadow: 0 0 12px rgba(255, 204, 0, 0.3);
+            background: rgba(255, 204, 0, 0.07) !important;
+        }
+    </style>
+</head>
+<body class="min-h-screen relative overflow-x-hidden pb-12">
+    <div class="fixed inset-0 scanline-overlay z-50 pointer-events-none opacity-40"></div>
+
+    <header class="border-b border-cyber-border bg-cyber-bg/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-cyber-cyan via-cyber-purple to-cyber-pink p-[2px] flex items-center justify-center shadow-[0_0_15px_rgba(0,240,255,0.4)]">
+                    <div class="w-full h-full bg-cyber-bg rounded-[6px] flex items-center justify-center">
+                        <i class="fa-solid font-bold text-cyber-cyan text-lg fa-graduation-cap"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="font-orbitron font-bold text-xl sm:text-2xl text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan via-white to-cyber-pink tracking-wider">
+                        МППК <span class="text-xs uppercase px-2 py-0.5 rounded bg-cyber-purple/30 border border-cyber-purple text-cyber-cyan font-sans ml-1">Cyber Schedule</span>
+                    </h1>
+                    <p class="text-xs text-gray-400 font-rajdhani tracking-widest uppercase">Мукачівський Професійний Політехнічний Коледж</p>
+                </div>
+            </div>
+
+            <!-- Header Controls: Search & Date Status -->
+            <div class="flex items-center gap-3 w-full sm:w-auto">
+                <div class="relative flex-1 sm:w-64">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+                    <input type="text" id="searchInput" placeholder="Пошук предмета чи кабінету..." 
+                        class="w-full bg-cyber-card border border-cyber-border rounded-lg pl-9 pr-4 py-1.5 text-sm focus:outline-none focus:border-cyber-cyan focus:ring-1 focus:ring-cyber-cyan transition-all text-gray-200 placeholder-gray-500">
+                </div>
+                
+                <button id="todayBtn" class="px-3 py-1.5 rounded-lg bg-cyber-purple/20 border border-cyber-purple text-cyber-cyan text-sm font-semibold hover:bg-cyber-purple/40 transition-all flex items-center gap-2 shadow-[0_0_10px_rgba(157,0,255,0.2)]">
+                    <i class="fa-solid fa-calendar-day"></i> <span class="hidden sm:inline">Сьогодні</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        
+        <section class="mb-6">
+            <div class="flex items-center justify-between mb-2">
+                <h2 class="font-orbitron text-sm uppercase text-cyber-cyan tracking-wider flex items-center gap-2">
+                    <i class="fa-solid fa-users text-xs"></i> Виберіть навчальну групу
+                </h2>
+                <span id="groupCountBadge" class="text-xs text-gray-400 font-mono">24 групи</span>
+            </div>
+
+            <!-- Group Chips Carousel -->
+            <div class="glass-panel p-3 rounded-xl shadow-lg border border-cyber-border">
+                <div id="groupPillsContainer" class="flex items-center gap-2 overflow-x-auto pb-2 pt-1 scrollbar-thin">
+                    <!-- Dynamic rendering of group pills -->
+                </div>
+            </div>
+        </section>
+
+        <section class="glass-panel p-4 rounded-xl mb-6 border border-cyber-border flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-cyber-cyan/10 border border-cyber-cyan/40 flex items-center justify-center text-cyber-cyan font-orbitron text-xl font-bold neon-border-cyan">
+                    <span id="selectedGroupTitle">КР-10</span>
+                </div>
+                <div>
+                    <h3 class="font-orbitron text-lg text-white font-bold tracking-wide flex items-center gap-2">
+                        Група <span id="currentGroupHeader" class="text-cyber-cyan">КР-10</span>
+                    </h3>
+                    <p class="text-xs text-gray-400" id="scheduleStatusText">Розклад занять на тиждень (Понеділок - П'ятниця)</p>
+                </div>
+            </div>
+
+            <!-- Day Selector Tabs -->
+            <div class="flex items-center gap-1 bg-cyber-bg/80 p-1 rounded-lg border border-cyber-border overflow-x-auto max-w-full" id="dayTabsContainer">
+                <button data-day="all" class="day-tab px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider transition-all active-day-tab">Весь тиждень</button>
+                <button data-day="Mon" class="day-tab px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider text-gray-400 hover:text-white transition-all">Пн</button>
+                <button data-day="Tue" class="day-tab px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider text-gray-400 hover:text-white transition-all">Вт</button>
+                <button data-day="Wed" class="day-tab px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider text-gray-400 hover:text-white transition-all">Ср</button>
+                <button data-day="Thu" class="day-tab px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider text-gray-400 hover:text-white transition-all">Чт</button>
+                <button data-day="Fri" class="day-tab px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider text-gray-400 hover:text-white transition-all">Пт</button>
+            </div>
+        </section>
+
+        <section id="scheduleGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            <!-- Dynamic Schedule Columns for Monday-Friday -->
+        </section>
+
+        <!-- Search Results Panel (Hidden by default) -->
+        <section id="searchResultsSection" class="hidden">
+            <div class="glass-panel p-4 rounded-xl border border-cyber-cyan/40 mb-4">
+                <h3 class="font-orbitron text-md text-cyber-cyan mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-list-check"></i> Результати пошуку: <span id="searchQueryTerm" class="text-white"></span>
+                </h3>
+                <div id="searchResultsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <!-- Search items rendered here -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        const SCHEDULE_DATA = {
+            "КР-10": {
+                "Mon": {1: ["Електротехніка", "37"], 3: ["Хімія", "39"], 4: ["Захист України", "27"], 5: ["ПДР", "37"], 6: ["Радіоелектроніка", "36"]},
+                "Tue": {1: ["Фізична культура", ""], 3: ["Чит. креслень", "35"], 4: ["Інф. технології", "23"], 5: ["Технологія РТА", "36"], 7: ["Іст. України", "41"]},
+                "Wed": {1: ["Фізика та астрономія", "36"], 3: ["Іноземна мова", "42/43"], 4: ["Матеріалознав.", "31"], 5: ["Укр. мова", "31"], 6: ["Укр. літ-ра", "25"], 7: ["Біологія", "39"], 8: ["Фізкультура", ""]},
+                "Thu": {1: ["Хімія", "39"], 2: ["Технології", "36"], 3: ["Інформатика", "40"], 4: ["Охорона праці", "13"], 5: ["Ел.радіо.вимір.", "35"], 6: ["Всесвітня історія", "41"], 7: ["Математика", "25"]},
+                "Fri": {1: ["Виробниче навчання", "практика"]}
+            },
+            "КР-11": {
+                "Mon": {1: ["Ринкова екон.", "34"], 2: ["Фізика і астр.", "25"], 3: ["Ел.радіовимір.", "35"], 4: ["Чит. креслень", "35"], 5: ["Укр. мова", "33"]},
+                "Tue": {1: ["Математика", "27"], 3: ["Географія", "41"], 4: ["Фізкультура", ""], 5: ["Історія України", "41"], 7: ["Інф. технології", "23"], 8: ["Укр. літ-ра", "33"]},
+                "Wed": {1: ["Охорона праці", "13"], 2: ["Хімія", "39"], 3: ["Фізика та астрономія", "25"], 5: ["Біологія та екологія", "39"], 7: ["Іноземна мова", "42/43"]},
+                "Thu": {1: ["Спецтехнологія", "35"], 2: ["Радіоелектроніка", "35"], 3: ["Осн.труд.права", "13"], 4: ["Укр. літ-ра", "33"], 5: ["Електротехніка", "37"], 6: ["Хімія", "39"], 7: ["Інформатика", "40"], 8: ["Захист України", "27"]},
+                "Fri": {1: ["Матеріалознав.", "25"], 2: ["Захист України", "27"], 3: ["Фізична культура", ""], 5: ["Спецтехнологія", "35"], 6: ["Математика", "25"]}
+            },
+            "КР-12": {
+                "Mon": {1: ["Хімія", "39"], 3: ["Фізкультура", ""], 4: ["Охорона праці", "13"], 5: ["Матеріалознав.", "21"], 6: ["Доп. і тех. вим.", "21"], 7: ["Фізика і астрономія", "24"]},
+                "Tue": {1: ["Спецтехнологія", "21"], 3: ["Інф. технології", "23"], 4: ["Біологія і екол.", "37"], 5: ["Математика", "25"], 7: ["Інформатика", "40"]},
+                "Wed": {1: ["Фізична культура", ""], 3: ["Матеріалознавство", "21"], 5: ["ПДР", "27"], 6: ["Географія", "41"], 7: ["Історія України", "41"]},
+                "Thu": {1: ["Допуски і технічні вимірювання", "21"], 3: ["Чит. креслень", "21"], 4: ["Захист України", "27"], 5: ["Укр. мова", "33"], 6: ["Укр. літ-ра", "33"], 7: ["Фізика і астрон.", "24"], 8: ["Іноземна мова", "42/43"]},
+                "Fri": {1: ["Виробниче навчання", "практика"]}
+            },
+            "КР-13": {
+                "Mon": {1: ["Психол.діл.відн", "38"], 2: ["Бухгалтерський облік", "34"], 4: ["Осн. док. забез.", "11"], 5: ["Технології", "34"], 6: ["Економіка п-ств", "34"], 7: ["Осн. мед.знань", "37"], 8: ["Укр. літ-ра", "33"]},
+                "Tue": {1: ["Хімія", "39"], 2: ["Історія України", "41"], 3: ["Українська мова", "33"], 5: ["Інф.сист.і технол", "23"], 6: ["Ділова укр.мова", "23"], 7: ["Бухгалтер.облік", "34"], 8: ["Математика", "25"]},
+                "Wed": {1: ["Біологія і екологія", "27"], 3: ["Фізична культура", ""], 5: ["Іноземна мова", "42/43"], 7: ["Фізика і астрон.", "24"], 8: ["Охорона праці", "13"]},
+                "Thu": {1: ["Осн.труд.права", "13"], 2: ["Охорона праці", "22"], 3: ["Бухгалтер.облік", "34"], 4: ["Осн. енергоефек.", "21"], 5: ["Фізкультура", ""], 6: ["Математика", "25"]},
+                "Fri": {1: ["Хімія", "39"], 2: ["Інформатика", "40"], 3: ["Фізика і астрономія", "24"], 5: ["Математика", "25"], 6: ["Укр.література", "33"]}
+            },
+            "КР-14": {
+                "Mon": {1: ["Спецтехнологія", "12"], 3: ["Іноземна мова", "42/43"], 4: ["Фізкультура", ""], 5: ["Захист України", "27"], 6: ["Технології", "23"], 7: ["Математика", "25"]},
+                "Tue": {1: ["Виробниче навчання", "практика"]},
+                "Wed": {1: ["Спецтехнологія", "12"], 3: ["Електротехніка", "12"], 5: ["Читан.креслень", "37"], 6: ["Охорона праці", "13"], 7: ["Фізика і астрон.", "36"]},
+                "Thu": {1: ["Фізична культура", ""], 3: ["Ел.матер.знавст", "12"], 4: ["Хімія", "39"], 5: ["Інформатика", "40"], 6: ["Біологія і екол.", "37"], 7: ["Історія України", "32"], 8: ["Географія", "32"]},
+                "Fri": {1: ["Історія України", "32"], 2: ["Укр. мова", "31"], 3: ["Укр. літ-ра", "31"], 4: ["Ринкова екон.", "34"], 5: ["Громад.освіта", "41"], 6: ["Зарубіж.літ-ра", "37"]}
+            },
+            "КР-15": {
+                "Mon": {1: ["Фізична культура", ""], 3: ["Технології", "37"], 4: ["Історія України", "32"], 5: ["Охорона праці", "13"], 6: ["Захист України", "27"], 7: ["Іноземна мова", "42/43"], 8: ["Спецтехнологія", "12"]},
+                "Tue": {1: ["Фізика і астрономія", "25"], 3: ["Фізкультура", ""], 4: ["Спецтехнологія", "12"], 6: ["Електротехніка", "12"], 7: ["Біологія і екол.", "37"], 8: ["Іноземна мова", "42/43"]},
+                "Wed": {1: ["Виробниче навчання", "практика"]},
+                "Thu": {1: ["Чит.буд.креслен.", "38"], 2: ["Осн.матеріалозн", "38"], 3: ["Зарубіж.літ-ра", "23"], 4: ["Географія", "32"], 5: ["Спецтехнологія", "12"], 6: ["Ринкова економ.", "34"], 7: ["Укр.мова", "34"], 8: ["Укр.література", "34"]},
+                "Fri": {1: ["Математика", "38"], 3: ["Інформатика", "40"], 4: ["Громад.освіта", "41"], 5: ["Всесвітня історія", "32"], 6: ["Хімія", "39"]}
+            },
+            "КР-16": {
+                "Mon": {1: ["Укр. мова", "33"], 2: ["Укр. літ-ра", "33"], 3: ["Осн. роб на ПК", "11"], 4: ["Математика", "38"], 5: ["Електрорадіо-вимірювання", "35"], 7: ["Захист України", "27"], 8: ["Електротехніка", "37"]},
+                "Tue": {1: ["ПДР", "41"], 2: ["Біологія і екологія", "37"], 4: ["Громад.освіта", "41"], 5: ["Історія України", "32"], 6: ["Всесвітня історія", "32"], 7: ["Укр. літ-ра", "33"], 8: ["Фізика і астрон.", "24"]},
+                "Wed": {1: ["Іноземна мова", "42/43"], 3: ["Фізика і астрономія", "24"], 5: ["Технологія ЛОМ", "36"]},
+                "Thu": {1: ["Заруб. літ-ра", "22"], 2: ["Охорона праці", "13"], 3: ["Фізична культура", ""], 5: ["Інф. технології", "25"], 6: ["Інформатика", "40"], 7: ["Укр. мова", "33"]},
+                "Fri": {1: ["Фізкультура", ""], 2: ["Хімія", "39"], 4: ["Чит. креслень", "36"], 5: ["Математика", "38"]}
+            },
+            "КР-17": {
+                "Mon": {1: ["Гарант. обслуг.", "11"], 2: ["Інформатика", "40"], 3: ["Фізична культура", ""], 5: ["Історія України", "32"], 7: ["Хімія", "39"]},
+                "Tue": {1: ["Українська література", "31"], 3: ["Фізика і астрон.", "24"], 4: ["Комп. графіка", "40"], 5: ["Українська мова", "33"], 7: ["Опер. системи", "11"], 8: ["Фізкультура", ""]},
+                "Wed": {1: ["Фізика і астрономія", "24"], 3: ["Проф. етика", "31"], 4: ["Іноземна мова", "42/43"], 5: ["Засоби КІС", "11"], 6: ["Географія", "32"], 7: ["Громад освіта", "32"], 8: ["Біологія і екол.", "37"]},
+                "Thu": {1: ["Іноземна мова", "42/43"], 3: ["Математика", "38"], 5: ["ТОІ", "11"], 7: ["Укр. літ-ра", "31"]},
+                "Fri": {1: ["Біологія і екологія", "22"], 3: ["Захист України", "27"], 5: ["Охорона праці", "31"]}
+            },
+            "КР-18": {
+                "Mon": {1: ["Осн.труд.закон.", "13"], 2: ["Математика", "38"], 4: ["Хімія", "39"], 5: ["Фізична культура", ""]},
+                "Tue": {1: ["Укр. мова", "33"], 2: ["Укр. літ-ра", "33"], 3: ["Технологія монтажу ТС", "36"], 5: ["Матеріалознавство", "35"]},
+                "Wed": {1: ["Укр.література", "33"], 2: ["Тех.монт.ВЕДЖ", "13"], 3: ["Технології", "27"], 4: ["Фізкультура", ""], 5: ["Охорона праці", "13"], 6: ["Інформатика", "40"], 7: ["Електротехніка", "34"]},
+                "Thu": {1: ["Тех.монт.ВЕДЖ", "27"], 2: ["Осн. ІКУ", "27"], 3: ["Укр. мова", "33"], 4: ["Інформатика", "40"], 5: ["Хімія", "39"], 6: ["Технологія монтажу ТС", "36"], 8: ["Тех.креслення", "37"]},
+                "Fri": {1: ["Фізика і астрономія", "24"], 3: ["Іноземна мова", "42/43"], 5: ["Захист України", "27"], 7: ["Біологія і екологія", "37"]}
+            },
+            "КР-19": {
+                "Mon": {1: ["Іноземна мова", "42/43"], 3: ["Українська література", "33"], 5: ["Хімія", "39"], 7: ["Опер. системи", "11"]},
+                "Tue": {1: ["Фізика і астрономія", "24"], 3: ["Іноземна мова", "42/43"], 4: ["Математика", "38"], 6: ["Комп. графіка", "40"], 7: ["Географія", "32"], 8: ["Охорона праці", "32"]},
+                "Wed": {1: ["ТОІ", "11"], 3: ["Гарант. обслуг.", "11"], 4: ["Проф. етика", "27"], 5: ["Інформатика", "40"], 6: ["Засоби КІС", "11"], 7: ["Біологія і екол.", "37"]},
+                "Thu": {1: ["Українська мова", "33"], 3: ["Громад. освіта", "32"], 4: ["Фізика і астрон.", "24"], 5: ["Захист України", "27"], 7: ["Фізична культура", ""]},
+                "Fri": {1: ["Укр. літ-ра", "33"], 2: ["Фізкультура", ""], 3: ["Історія України", "32"], 5: ["Біологія і екологія", "22"]}
+            },
+            "КР-21": {
+                "Mon": {1: ["Виробниче навчання", "практика"]},
+                "Tue": {1: ["Захист України", "13"], 3: ["Історія України", "32"], 4: ["Всесвітня історія", "32"], 5: ["Біологія і екологія.", "37"], 7: ["Хімія", "39"], 8: ["Фізкультура", ""]},
+                "Wed": {1: ["Математика", "38"], 3: ["Імп.та цифр.тех.", "35"], 4: ["Інформатика", "40"], 5: ["Географія", "32"], 6: ["Заруб. літ-ра", "31"], 7: ["Спецтехнологія", "35"], 8: ["Фізика і астрон.", "24"]},
+                "Thu": {1: ["Фізика і астрономія", "24"], 3: ["Фізична культура", ""], 5: ["Українська література", "31"], 7: ["Осн.радіоелектр", "35"], 8: ["Укр.мова", "33"]},
+                "Fri": {1: ["Громад. освіта", "41"], 2: ["Укр. мова", "33"], 3: ["Технології", "35"], 5: ["Іноземна мова", "42/43"]}
+            },
+            "КР-22": {
+                "Mon": {1: ["Виробнича практика", "ПРАКТИКА"]},
+                "Tue": {1: ["Виробнича практика", "ПРАКТИКА"]},
+                "Wed": {1: ["Виробнича практика", "ПРАКТИКА"]},
+                "Thu": {1: ["Виробнича практика", "ПРАКТИКА"]},
+                "Fri": {1: ["Виробнича практика", "ПРАКТИКА"]}
+            },
+            "КР-23": {
+                "Mon": {1: ["Виробниче навчання", "практика"]},
+                "Tue": {1: ["Математика", "38"], 3: ["Інформатика", "40"], 4: ["Укр. літ-ра", "31"], 5: ["Бухгалтерський облік", "34"], 7: ["Захист України (Осн. мед. знань)", "38"]},
+                "Wed": {1: ["Заруб. літ-ра", "31"], 2: ["Економіка п-ств", "34"], 3: ["Історія України", "41"], 4: ["Всесвітня історія", "41"], 5: ["Географія", "41"], 6: ["Фізична культура", ""], 8: ["Громад.освіта", "27"]},
+                "Thu": {1: ["Технології", "34"], 3: ["Інф.сист.бух.обл", "11"], 4: ["Бух.облік", "34"], 5: ["Іноземна мова", "42/43"], 6: ["Фізкультура", ""], 7: ["Хімія", "39"], 8: ["Осн.мед.знань", "31"]},
+                "Fri": {1: ["Економічний аналіз", "34"], 3: ["Біологія і екол.", "22"], 4: ["Укр. мова", "33"], 5: ["Фізика і астрономія", "36"]}
+            },
+            "КР-24": {
+                "Mon": {1: ["Фізична культура", ""], 3: ["Спецтехнологія", "12"], 5: ["Інформатика", "40"], 6: ["Українська мова", "33"]},
+                "Tue": {1: ["Іноземна мова", "42/43"], 3: ["Фізика і астрономія", "25"], 5: ["Хімія", "39"], 6: ["Математика", "38"], 7: ["Електротехніка", "12"]},
+                "Wed": {1: ["Виробниче навчання", "практика"]},
+                "Thu": {1: ["Історія України", "41"], 2: ["Географія", "41"], 3: ["Українська література", "31"], 5: ["Біологія і екол.", "34"], 6: ["Спецтехнологія", "12"], 7: ["Ел.матер.знав.", "12"], 8: ["Захист України", "13"]},
+                "Fri": {1: ["Захист України", "13"], 3: ["Спецтехнологія", "12"], 5: ["Електротехніка", "12"], 7: ["Фізкультура", ""]}
+            },
+            "КР-25": {
+                "Mon": {1: ["Інформатика", "40"], 2: ["Захист України", "13"], 4: ["Математика", "25"], 5: ["Спецтехнологія", "12"], 6: ["Громад. освіта", "22"]},
+                "Tue": {1: ["Спецтехнологія", "12"], 3: ["Укр. літ-ра", "31"], 4: ["Захист України", "13"], 5: ["Іноземна мова", "42/43"], 7: ["Фізкультура", ""], 8: ["Хімія", "39"]},
+                "Wed": {1: ["Математика", "25"], 3: ["Біологія і екологія", "37"], 5: ["Фізика і астрон.", "25"], 6: ["Українська мова", "33"], 8: ["Хімія", "39"]},
+                "Thu": {1: ["Українська література", "31"], 3: ["Фізика і астрономія", "25"], 5: ["Фізична культура", ""], 7: ["Історія України", "41"], 8: ["Географія", "41"]},
+                "Fri": {1: ["Виробниче навчання", "практика"]}
+            },
+            "КР-27": {
+                "Mon": {1: ["Фізика і астрономія", "36"], 3: ["Осн. програмув.", "40"], 4: ["Іноземна мова", "42/43"], 5: ["Математика", "25"], 7: ["Громад. освіта", "22"], 8: ["Заруб. літ-ра", "31"]},
+                "Tue": {1: ["Web-дизайн", "40"], 3: ["ТОІ", "11"], 4: ["Технології", "11"], 5: ["Укр. літ-ра", "31"], 6: ["Заруб. літ-ра", "21"], 7: ["Захист України", "13"]},
+                "Wed": {1: ["Виробниче навчання", "практика"]},
+                "Thu": {1: ["Біологія і екол.", "37"], 2: ["Хімія", "39"], 3: ["Історія України", "41"], 4: ["Всесвітня історія", "41"], 5: ["Комп’ютерна верстка", "23"], 7: ["Фізична культура", ""]},
+                "Fri": {1: ["Web-дизайн", "40"], 2: ["Географія", "41"], 3: ["Укр. мова", "33"], 4: ["Діагностика КІС", "22"], 5: ["Фізкультура", ""], 6: ["Інформатика", "40"]}
+            },
+            "КР-31": {
+                "Mon": {1: ["Спецтехнологія", "35"], 3: ["Укр. мова", "31"], 4: ["Укр. літ-ра", "31"], 5: ["Історія України", "41"], 6: ["Всесвітня історія", "41"], 7: ["Фізична культура", ""]},
+                "Tue": {1: ["Виробниче навчання", "практика"]},
+                "Wed": {1: ["Хімія", "39"], 2: ["Технології", "35"], 3: ["Інформатика", "40"], 4: ["Спецтехнологія", "35"], 5: ["Фізика і астрон.", "24"], 6: ["Громад. освіта", "27"], 7: ["Біологія і екол.", "27"], 8: ["Ел.радіо.вимір.", "35"]},
+                "Thu": {1: ["Виробниче навчання", "практика"]},
+                "Fri": {1: ["Іноземна мова", "42/43"], 2: ["Імп.та цифр.техн", "35"], 3: ["Математика", "38"], 4: ["Захист України", "13"], 5: ["Заруб. літ-ра", "33"], 6: ["Основи радіоелектроніка", "35"], 8: ["Фізкультура", ""]}
+            },
+            "КР-32": {
+                "Mon": {1: ["Технологія верстатних робіт", "21"], 3: ["Історія України", "41"], 4: ["Фізична культура", ""], 6: ["Іноземна мова", "42/43"], 7: ["Технологія верстатних робіт", "21"]},
+                "Tue": {1: ["Виробниче навчання", "практика"]},
+                "Wed": {1: ["Технологія верстатних робіт", "21"], 3: ["Математика", "38"], 4: ["Укр. мова", "33"], 5: ["Укр. літ-ра", "33"], 6: ["Фізика і астрон.", "24"], 7: ["Технологія верстатних робіт", "21"]},
+                "Thu": {1: ["Виробниче навчання", "практика"]},
+                "Fri": {1: ["Технологія верстатних робіт", "21"], 3: ["Фізкультура", ""], 4: ["Хімія", "39"], 5: ["Технології", "21"], 6: ["Техн.верст.робіт", "21"], 7: ["Біологія і екол.", "39"], 8: ["Захист України", "13"]}
+            },
+            "КР-33": {
+                "Mon": {1: ["Історія України", "41"], 2: ["Географія", "41"], 3: ["Громадянська освіта", "22"], 5: ["Фізична культура", ""], 7: ["Заруб. літ-ра", "31"], 8: ["Іноземна мова", "42/43"]},
+                "Tue": {1: ["Обсл.відвідувачів.", "11"], 2: ["ІК забез.обслуг.", "11"], 3: ["Хімія", "39"], 4: ["Фізика і астрон.", "24"], 5: ["Захист України (Осн. мед. знань)", "27"], 7: ["Укр. мова", "22"], 8: ["Укр. літ-ра", "22"]},
+                "Wed": {1: ["Всесвітня історія", "41"], 3: ["Технології", "34"], 4: ["Осн. маркетингу", "34"], 5: ["Фізкультура", ""], 6: ["Математика", "38"], 7: ["Заруб. літ-ра", "31"]},
+                "Thu": {1: ["Виробниче навчання", "практика"]},
+                "Fri": {1: ["Інф. технології", "11"], 2: ["Орг. техніка", "23"], 3: ["Фахова термінол.", "23"], 4: ["Біологія і екол.", "31"], 5: ["Докум.забезпеч.", "11"], 6: ["План.орган.техн.", "11"], 7: ["Інформатика", "40"]}
+            },
+            "КР-34": {
+                "Mon": {1: ["Виробнича практика", "ПРАКТИКА"]},
+                "Tue": {1: ["Виробнича практика", "ПРАКТИКА"]},
+                "Wed": {1: ["Виробнича практика", "ПРАКТИКА"]},
+                "Thu": {1: ["Виробнича практика", "ПРАКТИКА"]},
+                "Fri": {1: ["Виробнича практика", "ПРАКТИКА"]}
+            },
+            "КР-35": {
+                "Mon": {1: ["Укр. літ-ра", "25"], 2: ["Громад. освіта", "22"], 3: ["Фізика і астрономія", "24"], 5: ["Іноземна мова", "42/43"], 6: ["Спецтехнологія", "12"], 8: ["Фізкультура", ""]},
+                "Tue": {1: ["Українська література", "34"], 3: ["Математика", "38"], 4: ["Іноземна мова", "42/43"], 5: ["Інформатика", "40"], 6: ["Фізика і астрономія", "24"]},
+                "Wed": {1: ["Інформатика", "40"], 2: ["Укр. мова", "33"], 4: ["Математика", "38"], 6: ["Спецтехнологія", "12"], 7: ["Фізична культура", ""]},
+                "Thu": {1: ["Спецтехнологія", "12"], 3: ["Хімія", "39"], 4: ["Заруб. літ-ра", "22"], 5: ["Історія України", "32"], 6: ["Географія", "32"], 7: ["Біологія і екологія", "38"]},
+                "Fri": {1: ["Спецтехнологія", "12"], 3: ["Технології", "41"], 5: ["Захист України", "13"]}
+            },
+            "КР-36": {
+                "Mon": {1: ["Фізика і астрономія", "24"], 3: ["Географія", "32"], 4: ["Інформатика", "40"], 5: ["Радіоелектроніка", "36"], 6: ["Захист України", "13"], 8: ["Електрорадіовим", "36"]},
+                "Tue": {1: ["Технологія ЛОМ", "36"], 3: ["Громад. освіта", "27"], 4: ["Хімія", "39"], 5: ["Фізика і астрон.", "24"], 6: ["Фізична культура", ""]},
+                "Wed": {1: ["Історія України", "32"], 2: ["Всесвітня історія", "32"], 3: ["Технологія обсл. і ремонту ЛОМ", "36"], 5: ["Зарубіж.літ-ра", "23"], 6: ["Біологія і еколог.", "37"], 7: ["Укр.література", "38"], 8: ["Укр.мова", "33"]},
+                "Thu": {1: ["Виробниче навчання", "практика"]},
+                "Fri": {1: ["Технології", "36"], 2: ["Іноземна мова", "42/43"], 3: ["Математика", "25"], 5: ["Осн.програмув.", "40"], 6: ["Фізкультура", ""]}
+            },
+            "КР-37": {
+                "Mon": {1: ["Українська мова", "31"], 3: ["Технологія ЛОМ", "36"], 4: ["Історія України", "41"], 5: ["Фізика і астрон.", "24"], 6: ["Електротехніка", "37"], 7: ["Географія", "41"], 8: ["Фізкультура", ""]},
+                "Tue": {1: ["Виробниче навчання", "практика"]},
+                "Wed": {1: ["Укр.мова", "37"], 2: ["Інформатика", "40"], 3: ["Хімія", "39"], 4: ["Математика", "39"], 5: ["Захист України", "21"], 7: ["Українська література", "22"]},
+                "Thu": {1: ["Радіоелектроніка", "36"], 2: ["Біологія і екол.", "37"], 3: ["Ел.радіовимір", "36"], 4: ["Захист України", "36"], 5: ["Історія України", "41"], 6: ["Іноземна мова", "42/43"], 8: ["Інформатика", "40"]},
+                "Fri": {1: ["Укр.література", "37"], 2: ["Чит.креслень", "37"], 3: ["Технології", "11"], 5: ["Фізична культура", ""]}
+            },
+            "Т-1": {
+                "Mon": {1: ["Виробниче навчання", "практика"]},
+                "Tue": {1: ["Електрорадіо- вимірювання", "35"], 3: ["Спецтехнологія", "13"], 5: ["Фізична культура", ""], 7: ["Охорона праці", "35"], 8: ["Спецтехнологія", "35"]},
+                "Wed": {1: ["Ринкова економ.", "34"], 2: ["Електротехніка", "37"], 3: ["Спецтехнологія", "13"], 5: ["Читання креслень", "35"], 7: ["Осн.трудов.з-ва", "13"], 8: ["Спецтехнологія", "38"]},
+                "Thu": {1: ["Виробниче навчання", "практика"]},
+                "Fri": {1: ["Чит. креслень", "35"], 2: ["Інф. технології", "11"], 3: ["Спецтехнологія", "37"], 5: ["Матеріалознав.", "34"], 6: ["Спецтехнологія", "34"], 7: ["Осн.трудов.з-ва", "13"]}
+            }
+        };
+
+        const DAYS_MAP = {
+            "Mon": "Понеділок",
+            "Tue": "Вівторок",
+            "Wed": "Середа",
+            "Thu": "Четвер",
+            "Fri": "П'ятниця"
+        };
+
+        let currentGroup = "КР-10";
+        let currentDayFilter = "all";
+
+        // DOM Elements
+        const groupPillsContainer = document.getElementById('groupPillsContainer');
+        const scheduleGrid = document.getElementById('scheduleGrid');
+        const selectedGroupTitle = document.getElementById('selectedGroupTitle');
+        const currentGroupHeader = document.getElementById('currentGroupHeader');
+        const searchInput = document.getElementById('searchInput');
+        const searchResultsSection = document.getElementById('searchResultsSection');
+        const searchResultsList = document.getElementById('searchResultsList');
+        const searchQueryTerm = document.getElementById('searchQueryTerm');
+        const todayBtn = document.getElementById('todayBtn');
+
+        function initApp() {
+            renderGroupPills();
+            renderSchedule();
+
+            // Setup Search Listener
+            searchInput.addEventListener('input', handleSearch);
+
+            // Day Tab Controls
+            document.querySelectorAll('.day-tab').forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    document.querySelectorAll('.day-tab').forEach(t => t.classList.remove('active-day-tab'));
+                    tab.classList.add('active-day-tab');
+                    currentDayFilter = tab.getAttribute('data-day');
+                    renderSchedule();
+                });
+            });
+
+            // Today Button Click
+            todayBtn.addEventListener('click', () => {
+                const jsDay = new Date().getDay();
+                const dayKeys = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+                const todayKey = dayKeys[jsDay];
+
+                if (["Mon", "Tue", "Wed", "Thu", "Fri"].includes(todayKey)) {
+                    currentDayFilter = todayKey;
+                    document.querySelectorAll('.day-tab').forEach(t => {
+                        if (t.getAttribute('data-day') === todayKey) {
+                            t.click();
+                        }
+                    });
+                } else {
+                    currentDayFilter = "Mon";
+                    document.querySelector('[data-day="Mon"]').click();
+                }
+            });
+        }
+
+        // Render Group Chips
+        function renderGroupPills() {
+            groupPillsContainer.innerHTML = '';
+            Object.keys(SCHEDULE_DATA).forEach(group => {
+                const isSelected = group === currentGroup;
+                const button = document.createElement('button');
+                button.className = `px-3 py-1.5 rounded-lg font-orbitron text-xs tracking-wider transition-all whitespace-nowrap ${
+                    isSelected 
+                        ? 'bg-cyber-cyan text-cyber-bg font-bold shadow-[0_0_12px_rgba(0,240,255,0.6)] scale-105' 
+                        : 'bg-cyber-card border border-cyber-border text-gray-300 hover:border-cyber-cyan hover:text-white'
+                }`;
+                button.textContent = group;
+                button.onclick = () => {
+                    currentGroup = group;
+                    selectedGroupTitle.textContent = group;
+                    currentGroupHeader.textContent = group;
+                    renderGroupPills();
+                    renderSchedule();
+                };
+                groupPillsContainer.appendChild(button);
+            });
+        }
+
+        function renderSchedule() {
+            scheduleGrid.innerHTML = '';
+            searchResultsSection.classList.add('hidden');
+            scheduleGrid.classList.remove('hidden');
+
+            const groupSchedule = SCHEDULE_DATA[currentGroup] || {};
+            const daysToDisplay = currentDayFilter === 'all' ? ["Mon", "Tue", "Wed", "Thu", "Fri"] : [currentDayFilter];
+
+            daysToDisplay.forEach(dayKey => {
+                const dayName = DAYS_MAP[dayKey];
+                const dayData = groupSchedule[dayKey] || {};
+
+                const dayColumn = document.createElement('div');
+                dayColumn.className = 'glass-panel rounded-xl overflow-hidden border border-cyber-border flex flex-col h-full';
+
+                const jsDay = new Date().getDay();
+                const dayMapJs = {1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri"};
+                const isToday = dayMapJs[jsDay] === dayKey;
+
+                dayColumn.innerHTML = `
+                    <div class="px-4 py-2.5 bg-cyber-panel/90 border-b border-cyber-border flex items-center justify-between ${isToday ? 'bg-gradient-to-r from-cyber-cyan/20 to-cyber-purple/20 border-cyber-cyan/50' : ''}">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-calendar-day text-xs ${isToday ? 'text-cyber-cyan animate-pulse' : 'text-gray-400'}"></i>
+                            <span class="font-orbitron font-bold text-sm tracking-wide ${isToday ? 'text-cyber-cyan neon-text-cyan' : 'text-white'}">${dayName}</span>
+                        </div>
+                        ${isToday ? '<span class="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-cyber-cyan text-cyber-bg">Сьогодні</span>' : ''}
+                    </div>
+                    <div class="p-3 flex-1 flex flex-col gap-2.5">
+                        ${renderDayLessons(dayData)}
+                    </div>
+                `;
+
+                scheduleGrid.appendChild(dayColumn);
+            });
+        }
+
+        function renderDayLessons(dayData) {
+            let html = '';
+
+            if (dayData[1] && (dayData[1][1] === "практика" || dayData[1][1] === "ПРАКТИКА")) {
+                return `
+                    <div class="glass-card p-4 rounded-xl practice-glow flex flex-col items-center justify-center text-center my-auto min-h-[220px]">
+                        <div class="w-12 h-12 rounded-full bg-cyber-yellow/20 border border-cyber-yellow flex items-center justify-center text-cyber-yellow text-xl mb-2">
+                            <i class="fa-solid fa-wrench"></i>
+                        </div>
+                        <h4 class="font-orbitron font-bold text-cyber-yellow text-md tracking-wider">${dayData[1][0]}</h4>
+                        <p class="text-xs text-gray-300 mt-1">День практичних та виробничих занять</p>
+                        <span class="mt-3 px-2.5 py-1 rounded-full bg-cyber-yellow/20 text-cyber-yellow text-[11px] font-mono border border-cyber-yellow/40">Весь день</span>
+                    </div>
+                `;
+            }
+
+            let hasLessons = false;
+            for (let i = 1; i <= 8; i++) {
+                if (dayData[i]) {
+                    hasLessons = true;
+                    const [subject, cab] = dayData[i];
+                    const isPractice = subject.toLowerCase().includes('виробнич') || subject.toLowerCase().includes('практика');
+
+                    html += `
+                        <div class="glass-card p-2.5 rounded-lg border border-cyber-border hover:border-cyber-cyan/50 flex items-center justify-between gap-2 group transition-all">
+                            <div class="flex items-center gap-2.5 min-w-0">
+                                <div class="w-7 h-7 rounded-md bg-cyber-bg border border-cyber-border group-hover:border-cyber-cyan/40 flex items-center justify-center font-orbitron text-xs text-cyber-cyan font-bold flex-shrink-0">
+                                    ${i}
+                                </div>
+                                <div class="min-w-0">
+                                    <p class="text-xs font-semibold text-gray-200 group-hover:text-cyber-cyan transition-colors truncate" title="${subject}">
+                                        ${subject}
+                                    </p>
+                                    ${isPractice ? '<span class="text-[10px] text-cyber-yellow flex items-center gap-1"><i class="fa-solid fa-gear text-[9px]"></i> Практика</span>' : ''}
+                                </div>
+                            </div>
+                            ${cab ? `
+                                <div class="flex-shrink-0">
+                                    <span class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-cyber-purple/20 text-cyber-cyan border border-cyber-purple/40 shadow-[0_0_8px_rgba(157,0,255,0.2)]">
+                                        каб. ${cab}
+                                    </span>
+                                </div>
+                            ` : `
+                                <span class="text-[10px] text-gray-500 italic">спортзал</span>
+                            `}
+                        </div>
+                    `;
+                }
+            }
+
+            if (!hasLessons) {
+                html = `
+                    <div class="flex flex-col items-center justify-center h-full py-8 text-gray-500 text-xs">
+                        <i class="fa-solid fa-mug-hot text-2xl mb-1 text-gray-600"></i>
+                        <span>Немає занять</span>
+                    </div>
+                `;
+            }
+
+            return html;
+        }
+
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase().trim();
+
+            if (query.length < 2) {
+                searchResultsSection.classList.add('hidden');
+                scheduleGrid.classList.remove('hidden');
+                return;
+            }
+
+            scheduleGrid.classList.add('hidden');
+            searchResultsSection.classList.remove('hidden');
+            searchQueryTerm.textContent = `"${query}"`;
+            searchResultsList.innerHTML = '';
+
+            let resultsFound = 0;
+
+            Object.entries(SCHEDULE_DATA).forEach(([groupName, groupData]) => {
+                Object.entries(groupData).forEach(([dayKey, dayLessons]) => {
+                    Object.entries(dayLessons).forEach(([lessonNum, lessonInfo]) => {
+                        const [subject, cab] = lessonInfo;
+                        if (subject.toLowerCase().includes(query) || (cab && cab.toLowerCase().includes(query))) {
+                            resultsFound++;
+                            const resultCard = document.createElement('div');
+                            resultCard.className = 'glass-card p-3 rounded-xl border border-cyber-border hover:border-cyber-cyan transition-all flex flex-col justify-between';
+                            resultCard.innerHTML = `
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="px-2 py-0.5 rounded text-xs font-orbitron font-bold bg-cyber-cyan/20 text-cyber-cyan border border-cyber-cyan/40">${groupName}</span>
+                                    <span class="text-xs text-gray-400"><i class="fa-solid fa-calendar text-[10px] mr-1"></i>${DAYS_MAP[dayKey]} (${lessonNum} пара)</span>
+                                </div>
+                                <h4 class="font-semibold text-sm text-white mb-2">${subject}</h4>
+                                <div class="flex items-center justify-between text-xs text-gray-400 border-t border-cyber-border/50 pt-2">
+                                    <span>Кабінет:</span>
+                                    <span class="font-mono text-cyber-cyan font-bold">${cab ? 'каб. ' + cab : 'Спортзал / Інше'}</span>
+                                </div>
+                            `;
+                            resultCard.onclick = () => {
+                                currentGroup = groupName;
+                                selectedGroupTitle.textContent = groupName;
+                                currentGroupHeader.textContent = groupName;
+                                searchInput.value = '';
+                                renderGroupPills();
+                                renderSchedule();
+                            };
+                            searchResultsList.appendChild(resultCard);
+                        }
+                    });
+                });
+            });
+
+            if (resultsFound === 0) {
+                searchResultsList.innerHTML = `
+                    <div class="col-span-full py-8 text-center text-gray-400">
+                        <i class="fa-solid fa-magnifying-glass-minus text-3xl mb-2 text-cyber-pink"></i>
+                        <p>За вашим запитом предметів чи кабінетів не знайдено.</p>
+                    </div>
+                `;
+            }
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
